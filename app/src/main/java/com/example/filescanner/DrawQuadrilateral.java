@@ -15,6 +15,7 @@ import android.view.View;
 import java.util.ArrayList;
 
 public class DrawQuadrilateral extends View {
+    // https://stackoverflow.com/questions/8974088/how-to-create-a-resizable-rectangle-with-user-touch-events-on-android
     Point[] points = new Point[4];
 
     /**
@@ -137,7 +138,9 @@ public class DrawQuadrilateral extends View {
                                 .sqrt((double) (((centerX - X) * (centerX - X)) + (centerY - Y)
                                         * (centerY - Y)));
 
-                        if (radCircle < ball.getWidthOfBall()) {
+                        double TOUCH_SCALE = 1.2;
+                        if (radCircle < TOUCH_SCALE * ball.getWidthOfBall()
+                                || radCircle < TOUCH_SCALE * ball.getHeightOfBall()) {
 
                             balID = ball.getID();
                             invalidate();
