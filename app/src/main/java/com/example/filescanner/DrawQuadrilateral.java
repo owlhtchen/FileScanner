@@ -8,11 +8,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DrawQuadrilateral extends View {
     // https://stackoverflow.com/questions/8974088/how-to-create-a-resizable-rectangle-with-user-touch-events-on-android
@@ -48,37 +54,46 @@ public class DrawQuadrilateral extends View {
         setFocusable(true); // necessary for getting the touch events
     }
 
-    private void initRectangle(int X, int Y) {
+    private void initRectangle() {
         //initialize rectangle.
-        points[0] = new Point();
-        points[0].x = X;
-        points[0].y = Y;
+//        RelativeLayout r = (RelativeLayout) ((ViewGroup) this.getParent()).getParent();
+        RelativeLayout r = (RelativeLayout) (this.getParent());
+        ImageView imageView = r.findViewById(R.id.imported_image);
+        Log.v("imageview", imageView.toString());
 
-        points[1] = new Point();
-        points[1].x = X + 400;
-        points[1].y = Y;
+        Bitmap tempBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        List<org.opencv.core.Point> contourPoints = ImageBitmap.getContourPoints(tempBitmap);
+        for(int i = 0; i < 4; i++) {
+            points[i] = new Point();
+            points[i].x = (int) contourPoints.get(i).x;
+            points[i].y = (int) contourPoints.get(i).y;
+        }
 
-        points[2] = new Point();
-        points[2].x = X + 400;
-        points[2].y = Y + 400;
-
-        points[3] = new Point();
-        points[3].x = X;
-        points[3].y = Y + 400;
-
-        balID = 2;
+//        balID = 2;
         // declare each ball with the ColorBall class
         for (int i = 0; i < points.length; i++) {
             colorballs.add(new ColorBall(getContext(), R.drawable.gray_circle, points[i], i));
         }
     }
 
+//    public android.graphics.Point cvPointToGraphicsPoint(org.opencv.core.Point point) {
+//        scale=Math.min(mOpenCvCameraView.getWidth()/Matwidth,mOpenCvCameraView.getHeight())/Matheight)
+//
+//        xoffset=(mOpenCvCameraView.getWidth()-scale*Matwidth)/2
+//        yoffset=(mOpenCvCameraView.getHeight()-scale*Matheight)/2
+//        final point1's X coordinate is: point1.x*scale+xoffset
+//        final point1's Y coordinate is: point1.y*scale+yoffset
+//
+//        final point2's X coordinate is: point2.x*scale+xoffset
+//        final point2's Y coordinate is: point2.y*scale+yoffset
+//    }
+
     // the method that draws the balls
     @Override
     protected void onDraw(Canvas canvas) {
         if(points[3]==null) {
             //point4 null when view first create
-            initRectangle(70,  70);
+            initRectangle();
         }
 
         paint.setColor(Color.RED);
@@ -121,7 +136,7 @@ public class DrawQuadrilateral extends View {
             case MotionEvent.ACTION_DOWN: // touch down so check if the finger is on
                 // a ball
                 if (points[0] == null) {
-                    initRectangle(X, Y);
+                    initRectangle();
                 } else {
                     //resize rectangle
                     balID = -1;

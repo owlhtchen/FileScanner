@@ -8,8 +8,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.filescanner.constants.MyConstants;
+
+import org.opencv.android.OpenCVLoader;
 
 import static com.example.filescanner.constants.MyConstants.IMPORT_IMAGE_CHOSEN;
 
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initElements();
         initListeners();
+        testImportOpenCV();
     }
 
     void initElements() {
@@ -38,6 +42,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, IMPORT_IMAGE_CHOSEN);
             }
         });
+    }
+
+    void testImportOpenCV() {
+        if(OpenCVLoader.initDebug()){
+            Toast.makeText(this, "openCv successfully loaded", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "openCv cannot be loaded", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
