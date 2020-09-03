@@ -33,7 +33,7 @@ import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
 import static org.opencv.imgproc.Imgproc.findContours;
 
 public class ImageBitmap {
-    private static Bitmap original;
+    public static Bitmap original;
 
     public static Bitmap getOriginal() {
         return original;
@@ -80,6 +80,10 @@ public class ImageBitmap {
                 matrix, true);
     }
 
+    public static List<org.opencv.core.Point> getContourPoints() {
+        return getContourPoints(original);
+    }
+
     public static List<org.opencv.core.Point> getContourPoints(Bitmap bitmap) {
         Mat grey = new Mat();
         Mat blurredGrey = new Mat();
@@ -97,8 +101,8 @@ public class ImageBitmap {
                 return (int)  -(contourArea(mop1) - contourArea(mop2));
             }
         });
-        Log.v("length of contours lists", contours.size() + "");
-        logContourAreaList(contours);
+//        Log.v("length of contours lists", contours.size() + "");
+//        logContourAreaList(contours);
 
         Point topLeft = new Point(70.0, 70.0);
         Point topRight = new Point(70.0 + 800, 70.0);
@@ -119,10 +123,49 @@ public class ImageBitmap {
             }
         }
         contourPoints = orderPoints(contourPoints);
-        logCVPoints(contourPoints);
-        Log.v("image width", bitmap.getWidth()+ "");
-        Log.v("image height", bitmap.getHeight() + "");
+//        logCVPoints(contourPoints);
+//        Log.v("image width", bitmap.getWidth()+ "");
+//        Log.v("image height", bitmap.getHeight() + "");
         return contourPoints;
+    }
+
+    public static void getContourPoints(Bitmap bitmap, MatOfPoint2f contourPoints) {
+        Mat grey = new Mat();
+        Mat blurredGrey = new Mat();
+        Mat edged = new Mat();
+        cvtColor(bitmapToMat(bitmap), grey, COLOR_BGR2GRAY);
+        GaussianBlur(grey, blurredGrey, new Size(5.0, 5.0), 0);
+        Canny(blurredGrey, edged, 75.0, 200.0);
+
+        Mat hierarchy = new Mat();
+        List<MatOfPoint> contours = new ArrayList<>();
+        findContours(edged, contours, hierarchy, RETR_LIST, CHAIN_APPROX_SIMPLE);
+        contours.sort(new Comparator<MatOfPoint>() {
+            @Override
+            public int compare(MatOfPoint mop1, MatOfPoint mop2) {
+                return (int)  -(contourArea(mop1) - contourArea(mop2));
+            }
+        });
+//        Log.v("length of contours lists", contours.size() + "");
+//        logContourAreaList(contours);
+
+        Point topLeft = new Point(70.0, 70.0);
+        Point topRight = new Point(70.0 + 800, 70.0);
+        Point bottomRight = new Point(70.0 + 800, 70.0 + 800);
+        Point bottomLeft = new Point(70.0, 70.0 + 800);
+
+        for( MatOfPoint mop: contours ){
+
+            MatOfPoint2f mop2f = new MatOfPoint2f(mop.toArray());
+            double peri = arcLength(mop2f, true);
+            MatOfPoint2f approx = new MatOfPoint2f();
+            approxPolyDP(mop2f, approx, 0.02 * peri, true);
+
+            if(approx.toList().size() == 4) {
+                contourPoints = approx;
+                break;
+            }
+        }
     }
 
     public static void logContourAreaList(List<MatOfPoint> contours) {

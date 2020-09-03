@@ -17,6 +17,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,37 +63,52 @@ public class DrawQuadrilateral extends View {
 
     private void initRectangle() {
         //initialize rectangle.
-//        RelativeLayout r = (RelativeLayout) ((ViewGroup) this.getParent()).getParent();
         RelativeLayout r = (RelativeLayout) (this.getParent());
         ImageView imageView = r.findViewById(R.id.imported_image);
-        Log.v("imageview", imageView.toString());
+//        Bitmap tempBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
 
-        Bitmap tempBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        List<org.opencv.core.Point> contourPoints = ImageBitmap.getContourPoints(tempBitmap);
+        List<org.opencv.core.Point> contourPoints = ImageBitmap.getContourPoints();
+
+//        double imageWidth = ImageBitmap.getOriginal().getWidth();
+        double imageWidth = imageView.getDrawable().getIntrinsicWidth();
+//        double imageHeight = ImageBitmap.getOriginal().getHeight();
+        double imageHeight = imageView.getDrawable().getIntrinsicHeight();
+//        double displayWidth = getWidth();
+        double displayWidth = imageView.getMeasuredWidth();
+//        double displayHeight = getHeight();
+        double displayHeight = imageView.getMeasuredHeight();
+
+        // https://stackoverflow.com/questions/27730557/coordinate-conversion-from-org-opencv-core-point-to-android-graphics-point
+        double scale = Math.min(displayWidth / imageWidth, displayHeight / imageHeight);
+        double xOffset = (displayWidth - scale * imageWidth) / 2.0;
+        double yOffset = (displayHeight - scale * imageHeight) / 2.0;
+
         for(int i = 0; i < 4; i++) {
             points[i] = new Point();
-            points[i].x = (int) contourPoints.get(i).x;
-            points[i].y = (int) contourPoints.get(i).y;
+            points[i].x = (int) (contourPoints.get(i).x * scale + xOffset);
+            points[i].y = (int) (contourPoints.get(i).y * scale + yOffset);
+            Log.v("width", contourPoints.get(i).x  + "");
+            Log.v("height", contourPoints.get(i).y  + "");
         }
+        // debug
+//        points[0] = new Point();
+//        points[0].x = 0;
+//        points[0].y = 0;
+//        points[1] = new Point();
+//        points[1].x = imageView.getWidth();
+//        points[1].y = 0;
+//        points[2] = new Point();
+//        points[2].x = imageView.getWidth();
+//        points[2].y = imageView.getHeight();
+//        points[3] = new Point();
+//        points[3].x = 0;
+//        points[3].y = imageView.getHeight();
 
-//        balID = 2;
         // declare each ball with the ColorBall class
         for (int i = 0; i < points.length; i++) {
             colorballs.add(new ColorBall(getContext(), R.drawable.gray_circle, points[i], i));
         }
     }
-
-//    public android.graphics.Point cvPointToGraphicsPoint(org.opencv.core.Point point) {
-//        scale=Math.min(mOpenCvCameraView.getWidth()/Matwidth,mOpenCvCameraView.getHeight())/Matheight)
-//
-//        xoffset=(mOpenCvCameraView.getWidth()-scale*Matwidth)/2
-//        yoffset=(mOpenCvCameraView.getHeight()-scale*Matheight)/2
-//        final point1's X coordinate is: point1.x*scale+xoffset
-//        final point1's Y coordinate is: point1.y*scale+yoffset
-//
-//        final point2's X coordinate is: point2.x*scale+xoffset
-//        final point2's Y coordinate is: point2.y*scale+yoffset
-//    }
 
     // the method that draws the balls
     @Override
@@ -172,6 +194,7 @@ public class DrawQuadrilateral extends View {
                     // move the balls the same as the finger
                     colorballs.get(balID).setX(X);
                     colorballs.get(balID).setY(Y);
+                    Log.v("touching", X + ", " + Y);
 
                     paint.setColor(Color.CYAN);
                     invalidate();

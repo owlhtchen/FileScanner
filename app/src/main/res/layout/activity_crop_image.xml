@@ -9,7 +9,8 @@
     <ImageView
         android:id="@+id/imported_image"
         android:layout_width="match_parent"
-        android:layout_height="600dp" />
+        android:layout_height="600dp" >
+    </ImageView>
 
     <com.example.filescanner.DrawQuadrilateral
         android:layout_width="match_parent"
