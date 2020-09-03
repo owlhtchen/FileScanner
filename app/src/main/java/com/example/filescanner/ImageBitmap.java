@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Size;
 
@@ -24,6 +25,8 @@ import static org.opencv.imgproc.Imgproc.CHAIN_APPROX_SIMPLE;
 import static org.opencv.imgproc.Imgproc.Canny;
 import static org.opencv.imgproc.Imgproc.GaussianBlur;
 import static org.opencv.imgproc.Imgproc.RETR_LIST;
+import static org.opencv.imgproc.Imgproc.approxPolyDP;
+import static org.opencv.imgproc.Imgproc.arcLength;
 import static org.opencv.imgproc.Imgproc.contourArea;
 import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
@@ -104,8 +107,14 @@ public class ImageBitmap {
 
         List<Point> contourPoints = new ArrayList<Point>(Arrays.asList(topLeft, topRight, bottomRight, bottomLeft));
         for( MatOfPoint mop: contours ){
-            if(mop.toList().size() == 4) {
-                contourPoints = mop.toList();
+
+            MatOfPoint2f mop2f = new MatOfPoint2f(mop.toArray());
+            double peri = arcLength(mop2f, true);
+            MatOfPoint2f approx = new MatOfPoint2f();
+            approxPolyDP(mop2f, approx, 0.05 * peri, true);
+
+            if(approx.toList().size() == 4) {
+                contourPoints = approx.toList();
                 break;
             }
         }
