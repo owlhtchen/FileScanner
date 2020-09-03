@@ -41,6 +41,7 @@ public class CropImageActivity extends AppCompatActivity {
         ImageBitmap.setOriginal(original);
         try {
             ImageBitmap.rotateImageUpright();
+            ImageBitmap.resizeImage(800);
         } catch (IOException e) {
             e.printStackTrace();
         }

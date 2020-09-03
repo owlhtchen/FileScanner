@@ -87,8 +87,8 @@ public class DrawQuadrilateral extends View {
             points[i] = new Point();
             points[i].x = (int) (contourPoints.get(i).x * scale + xOffset);
             points[i].y = (int) (contourPoints.get(i).y * scale + yOffset);
-            Log.v("width", contourPoints.get(i).x  + "");
-            Log.v("height", contourPoints.get(i).y  + "");
+//            Log.v("width", contourPoints.get(i).x  + "");
+//            Log.v("height", contourPoints.get(i).y  + "");
         }
         // debug
 //        points[0] = new Point();
@@ -194,7 +194,7 @@ public class DrawQuadrilateral extends View {
                     // move the balls the same as the finger
                     colorballs.get(balID).setX(X);
                     colorballs.get(balID).setY(Y);
-                    Log.v("touching", X + ", " + Y);
+//                    Log.v("touching", X + ", " + Y);
 
                     paint.setColor(Color.CYAN);
                     invalidate();

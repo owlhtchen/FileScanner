@@ -73,6 +73,19 @@ public class ImageBitmap {
         return original;
     }
 
+    public static Bitmap resizeImage(int newHeight) {
+        if(original.getHeight() > newHeight) {
+            original = resizeImage(original, newHeight);
+        }
+        return original;
+    }
+
+    public static Bitmap resizeImage(Bitmap bitmap, int newHeight) {
+        double ratio = original.getWidth() * 1.0 / original.getHeight();
+        int newWidth = (int) (ratio * newHeight);
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+    }
+
     public static Bitmap rotateImage(float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
@@ -101,8 +114,9 @@ public class ImageBitmap {
                 return (int)  -(contourArea(mop1) - contourArea(mop2));
             }
         });
-//        Log.v("length of contours lists", contours.size() + "");
-//        logContourAreaList(contours);
+        Log.v("bitmap width, length", bitmap.getWidth() + ", " + bitmap.getHeight());
+        Log.v("length of contours lists", contours.size() + "");
+        logContourAreaList(contours);
 
         Point topLeft = new Point(70.0, 70.0);
         Point topRight = new Point(70.0 + 800, 70.0);
@@ -115,7 +129,7 @@ public class ImageBitmap {
             MatOfPoint2f mop2f = new MatOfPoint2f(mop.toArray());
             double peri = arcLength(mop2f, true);
             MatOfPoint2f approx = new MatOfPoint2f();
-            approxPolyDP(mop2f, approx, 0.05 * peri, true);
+            approxPolyDP(mop2f, approx, 0.02 * peri, true);
 
             if(approx.toList().size() == 4) {
                 contourPoints = approx.toList();
@@ -129,51 +143,17 @@ public class ImageBitmap {
         return contourPoints;
     }
 
-    public static void getContourPoints(Bitmap bitmap, MatOfPoint2f contourPoints) {
-        Mat grey = new Mat();
-        Mat blurredGrey = new Mat();
-        Mat edged = new Mat();
-        cvtColor(bitmapToMat(bitmap), grey, COLOR_BGR2GRAY);
-        GaussianBlur(grey, blurredGrey, new Size(5.0, 5.0), 0);
-        Canny(blurredGrey, edged, 75.0, 200.0);
-
-        Mat hierarchy = new Mat();
-        List<MatOfPoint> contours = new ArrayList<>();
-        findContours(edged, contours, hierarchy, RETR_LIST, CHAIN_APPROX_SIMPLE);
-        contours.sort(new Comparator<MatOfPoint>() {
-            @Override
-            public int compare(MatOfPoint mop1, MatOfPoint mop2) {
-                return (int)  -(contourArea(mop1) - contourArea(mop2));
-            }
-        });
-//        Log.v("length of contours lists", contours.size() + "");
-//        logContourAreaList(contours);
-
-        Point topLeft = new Point(70.0, 70.0);
-        Point topRight = new Point(70.0 + 800, 70.0);
-        Point bottomRight = new Point(70.0 + 800, 70.0 + 800);
-        Point bottomLeft = new Point(70.0, 70.0 + 800);
-
+    public static void logContourAreaList(List<MatOfPoint> contours) {
         for( MatOfPoint mop: contours ){
-
             MatOfPoint2f mop2f = new MatOfPoint2f(mop.toArray());
             double peri = arcLength(mop2f, true);
             MatOfPoint2f approx = new MatOfPoint2f();
             approxPolyDP(mop2f, approx, 0.02 * peri, true);
 
+            Log.v(" ~ all contour area ", contourArea(mop) + ", with # corners " + approx.toList().size());
             if(approx.toList().size() == 4) {
-                contourPoints = approx;
-                break;
-            }
-        }
-    }
-
-    public static void logContourAreaList(List<MatOfPoint> contours) {
-        for( MatOfPoint mop: contours ){
-            if(mop.toList().size() == 4) {
-                // Log.v("contour area", contourArea(mop) + "");
-                Log.v("contour area", contourArea(mop) + "with points: ");
-                for( Point p: mop.toList() ){
+                Log.v("contour area", contourArea(approx) + " with points: ");
+                for( Point p: approx.toList() ){
                     // ... p.x, p.y ... // another coordinate
                     Log.v("         -- x, y", p.x + ", " + p.y);
                 }
