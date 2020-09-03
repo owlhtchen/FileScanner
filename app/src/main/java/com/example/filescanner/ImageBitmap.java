@@ -83,7 +83,7 @@ public class ImageBitmap {
     public static Bitmap resizeImage(Bitmap bitmap, int newHeight) {
         double ratio = original.getWidth() * 1.0 / original.getHeight();
         int newWidth = (int) (ratio * newHeight);
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false);
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
     }
 
     public static Bitmap rotateImage(float angle) {

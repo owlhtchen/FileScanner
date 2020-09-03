@@ -118,9 +118,9 @@ public class DrawQuadrilateral extends View {
             initRectangle();
         }
 
-        paint.setColor(Color.RED);
+        paint.setColor(Color.GREEN);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(15);
+        paint.setStrokeWidth(10);
 
         path.reset();
         path.moveTo(points[0].x, points[0].y);
@@ -223,6 +223,10 @@ public class DrawQuadrilateral extends View {
             this.id = id;
             bitmap = BitmapFactory.decodeResource(context.getResources(),
                     resourceId);
+            double scale = 0.45;
+            int dstWidth = (int) (scale * bitmap.getWidth());
+            int dstHeight = (int) (scale * bitmap.getHeight());
+            bitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight, true);
             mContext = context;
             this.point = point;
         }
