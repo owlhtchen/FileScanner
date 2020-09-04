@@ -128,9 +128,9 @@ public class ImageBitmap {
                 return (int)  -(contourArea(mop1) - contourArea(mop2));
             }
         });
-        Log.v("bitmap width, length", bitmap.getWidth() + ", " + bitmap.getHeight());
-        Log.v("length of contours lists", contours.size() + "");
-        logContourAreaList(contours);
+//        Log.v("bitmap width, length", bitmap.getWidth() + ", " + bitmap.getHeight());
+//        Log.v("length of contours lists", contours.size() + "");
+//        logContourAreaList(contours);
 
         Point topLeft = new Point(70.0, 70.0);
         Point topRight = new Point(70.0 + 800, 70.0);
@@ -247,14 +247,6 @@ public class ImageBitmap {
         Mat tempDest = vector_Point_to_Mat(destPoints);
         tempSrc.convertTo(src, CV_32F);
         tempDest.convertTo(dest, CV_32F);
-
-         Log.v("src", src.dump());
-         Log.v("dest", dest.dump());
-        Log.v("- src", String.valueOf((src.checkVector(2, CV_32F) == 4)));
-        Log.v("- dest", String.valueOf((dest.checkVector(2, CV_32F) == 4)));
-        Log.v("src depth", src.depth() + "");
-        Log.v("dest depth", dest.depth() + "");
-
 
         Mat transform = getPerspectiveTransform(src, dest);
          Mat srcImg = bitmapToMat(bitmap);
