@@ -31,9 +31,6 @@ public class DrawQuadrilateral extends View {
     // https://stackoverflow.com/questions/8974088/how-to-create-a-resizable-rectangle-with-user-touch-events-on-android
     Point[] points = new Point[4];
 
-    /**
-     * point1 and point 3 are of same group and same as point 2 and point4
-     */
     private ArrayList<ColorBall> colorballs = new ArrayList<>();
 
     // array that holds the balls
@@ -41,6 +38,9 @@ public class DrawQuadrilateral extends View {
     // variable to know what ball is being dragged
     Paint paint;
     Path path;
+    double displayMatScale;
+    double xOffset;
+    double yOffset;
 
     public DrawQuadrilateral(Context context) {
         this(context, null);
@@ -79,35 +79,33 @@ public class DrawQuadrilateral extends View {
         double displayHeight = imageView.getMeasuredHeight();
 
         // https://stackoverflow.com/questions/27730557/coordinate-conversion-from-org-opencv-core-point-to-android-graphics-point
-        double scale = Math.min(displayWidth / imageWidth, displayHeight / imageHeight);
-        double xOffset = (displayWidth - scale * imageWidth) / 2.0;
-        double yOffset = (displayHeight - scale * imageHeight) / 2.0;
+        displayMatScale = Math.min(displayWidth / imageWidth, displayHeight / imageHeight);
+        xOffset = (displayWidth - displayMatScale * imageWidth) / 2.0;
+        yOffset = (displayHeight - displayMatScale * imageHeight) / 2.0;
 
         for(int i = 0; i < 4; i++) {
             points[i] = new Point();
-            points[i].x = (int) (contourPoints.get(i).x * scale + xOffset);
-            points[i].y = (int) (contourPoints.get(i).y * scale + yOffset);
+            points[i].x = (int) (contourPoints.get(i).x * displayMatScale + xOffset);
+            points[i].y = (int) (contourPoints.get(i).y * displayMatScale + yOffset);
 //            Log.v("width", contourPoints.get(i).x  + "");
 //            Log.v("height", contourPoints.get(i).y  + "");
         }
-        // debug
-//        points[0] = new Point();
-//        points[0].x = 0;
-//        points[0].y = 0;
-//        points[1] = new Point();
-//        points[1].x = imageView.getWidth();
-//        points[1].y = 0;
-//        points[2] = new Point();
-//        points[2].x = imageView.getWidth();
-//        points[2].y = imageView.getHeight();
-//        points[3] = new Point();
-//        points[3].x = 0;
-//        points[3].y = imageView.getHeight();
 
         // declare each ball with the ColorBall class
         for (int i = 0; i < points.length; i++) {
             colorballs.add(new ColorBall(getContext(), R.drawable.gray_circle, points[i], i));
         }
+    }
+
+    public List<org.opencv.core.Point> getContourOpenCVPoints() {
+        List<org.opencv.core.Point> openCVPoints = new ArrayList<>();
+        for(int i = 0; i < points.length; i++) {
+            openCVPoints.add(new org.opencv.core.Point(
+                    (points[i].x * 1.0 - xOffset) / displayMatScale,
+                    (points[i].y * 1.0 - yOffset) / displayMatScale
+            ));
+        }
+        return openCVPoints;
     }
 
     // the method that draws the balls
@@ -223,9 +221,9 @@ public class DrawQuadrilateral extends View {
             this.id = id;
             bitmap = BitmapFactory.decodeResource(context.getResources(),
                     resourceId);
-            double scale = 0.45;
-            int dstWidth = (int) (scale * bitmap.getWidth());
-            int dstHeight = (int) (scale * bitmap.getHeight());
+            double ballScale = 0.45;
+            int dstWidth = (int) (ballScale * bitmap.getWidth());
+            int dstHeight = (int) (ballScale * bitmap.getHeight());
             bitmap = Bitmap.createScaledBitmap(bitmap, dstWidth, dstHeight, true);
             mContext = context;
             this.point = point;

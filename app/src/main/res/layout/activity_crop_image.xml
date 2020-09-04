@@ -13,7 +13,17 @@
     </ImageView>
 
     <com.example.filescanner.DrawQuadrilateral
+        android:id="@+id/quadrilateral"
         android:layout_width="match_parent"
         android:layout_height="600dp" />
+
+    <Button
+        android:id="@+id/crop_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        />
 
 </RelativeLayout>

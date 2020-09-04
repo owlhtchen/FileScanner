@@ -21,6 +21,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.lang.Math.max;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+import static org.opencv.core.CvType.CV_32F;
 import static org.opencv.imgproc.Imgproc.CHAIN_APPROX_SIMPLE;
 import static org.opencv.imgproc.Imgproc.Canny;
 import static org.opencv.imgproc.Imgproc.GaussianBlur;
@@ -31,9 +35,13 @@ import static org.opencv.imgproc.Imgproc.contourArea;
 import static org.opencv.imgproc.Imgproc.cvtColor;
 import static org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY;
 import static org.opencv.imgproc.Imgproc.findContours;
+import static org.opencv.imgproc.Imgproc.getPerspectiveTransform;
+import static org.opencv.imgproc.Imgproc.warpPerspective;
+import static org.opencv.utils.Converters.vector_Point_to_Mat;
 
 public class ImageBitmap {
-    public static Bitmap original;
+    private static Bitmap original;
+    private static List<org.opencv.core.Point> quadrilateralPoints;
 
     public static Bitmap getOriginal() {
         return original;
@@ -41,6 +49,14 @@ public class ImageBitmap {
 
     public static void setOriginal(Bitmap original) {
         ImageBitmap.original = original;
+    }
+
+    public static List<Point> getQuadrilateralPoints() {
+        return quadrilateralPoints;
+    }
+
+    public static void setQuadrilateralPoints(List<Point> points) {
+        ImageBitmap.quadrilateralPoints = orderPoints(points);;
     }
 
     public static Bitmap rotateImageUpright() throws IOException {
@@ -193,5 +209,60 @@ public class ImageBitmap {
         Bitmap bmp = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mat, bmp);
         return bmp;
+    }
+
+    public static Bitmap transformToRectImage() {
+        return transformToRectImage(original, quadrilateralPoints);
+    }
+
+    public static Bitmap transformToRectImage(Bitmap bitmap, List<Point> points) {
+        org.opencv.core.Point tempTopLeft = quadrilateralPoints.get(0);
+        org.opencv.core.Point tempTopRight = quadrilateralPoints.get(1);
+        org.opencv.core.Point tempBottomRight = quadrilateralPoints.get(2);
+        org.opencv.core.Point tempBottomLeft = quadrilateralPoints.get(3);
+
+        double width1 = sqrt(pow(tempTopLeft.x - tempTopRight.x, 2.0) +
+                pow(tempTopLeft.y - tempTopRight.y, 2.0));
+        double width2 = sqrt(pow(tempBottomLeft.x - tempBottomRight.x, 2.0) +
+                pow(tempBottomLeft.y - tempBottomRight.y, 2.0));
+        double maxWidth = max(width1, width2);
+
+        double height1 = sqrt(pow(tempTopRight.x - tempBottomRight.x, 2.0) +
+                pow(tempTopRight.y - tempBottomRight.y, 2.0 ));
+        double height2 = sqrt(pow(tempTopLeft.x - tempBottomLeft.x, 2.0) +
+                pow(tempTopLeft.y - tempTopLeft.y, 2.0));
+        double maxHeight = max(height1, height2);
+
+        List<Point> destPoints = new ArrayList<>();
+        org.opencv.core.Point topLeft = new Point(0.0, 0.0);
+        org.opencv.core.Point topRight = new Point(maxWidth - 1, 0.0);
+        org.opencv.core.Point bottomRight = new Point(maxWidth - 1, maxHeight - 1);
+        org.opencv.core.Point bottomLeft = new Point(0.0, maxHeight - 1);
+        destPoints.add(topLeft);
+        destPoints.add(topRight);
+        destPoints.add(bottomRight);
+        destPoints.add(bottomLeft);
+
+        Mat src = new Mat();
+        Mat dest = new Mat();
+        Mat tempSrc = vector_Point_to_Mat(points);
+        Mat tempDest = vector_Point_to_Mat(destPoints);
+        tempSrc.convertTo(src, CV_32F);
+        tempDest.convertTo(dest, CV_32F);
+
+         Log.v("src", src.dump());
+         Log.v("dest", dest.dump());
+        Log.v("- src", String.valueOf((src.checkVector(2, CV_32F) == 4)));
+        Log.v("- dest", String.valueOf((dest.checkVector(2, CV_32F) == 4)));
+        Log.v("src depth", src.depth() + "");
+        Log.v("dest depth", dest.depth() + "");
+
+
+        Mat transform = getPerspectiveTransform(src, dest);
+         Mat srcImg = bitmapToMat(bitmap);
+         Mat destImg = new Mat();
+         warpPerspective(srcImg, destImg, transform, new Size(maxWidth, maxHeight));
+
+         return matToBitmap(destImg);
     }
 }
