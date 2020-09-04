@@ -5,23 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-
-import org.opencv.core.Point;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import static com.example.filescanner.constants.MyConstants.IMPORT_IMAGE_CHOSEN;
 
 public class CropImageActivity extends AppCompatActivity {
     Uri importImageUri;
@@ -37,7 +30,7 @@ public class CropImageActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.imported_image);
         loadImage();
-        imageView.setImageBitmap(ImageBitmap.getOriginal());
+        imageView.setImageBitmap(ImageBitmap.getResizedImage());
     }
 
     void initElements() {

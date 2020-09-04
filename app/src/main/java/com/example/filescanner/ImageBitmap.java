@@ -2,9 +2,7 @@ package com.example.filescanner;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
-import android.widget.ImageView;
 
 
 import org.opencv.android.Utils;
@@ -17,7 +15,6 @@ import org.opencv.core.Size;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,7 +38,9 @@ import static org.opencv.utils.Converters.vector_Point_to_Mat;
 
 public class ImageBitmap {
     private static Bitmap original;
+    private static Bitmap resizedImage;
     private static List<org.opencv.core.Point> quadrilateralPoints;
+    private static double originalResizeRatio;
 
     public static Bitmap getOriginal() {
         return original;
@@ -51,66 +50,65 @@ public class ImageBitmap {
         ImageBitmap.original = original;
     }
 
+    public static Bitmap getResizedImage() {
+        return resizedImage;
+    }
+
+    public static void setResizedImage(Bitmap resizedImage) {
+        ImageBitmap.resizedImage = resizedImage;
+    }
+
     public static List<Point> getQuadrilateralPoints() {
         return quadrilateralPoints;
     }
 
     public static void setQuadrilateralPoints(List<Point> points) {
-        ImageBitmap.quadrilateralPoints = orderPoints(points);;
+        for(Point point: points) {
+            point.x = originalResizeRatio * point.x;
+            point.y = originalResizeRatio * point.y;
+        }
+        ImageBitmap.quadrilateralPoints = orderPoints(points);
     }
 
     public static Bitmap rotateImageUpright() throws IOException {
         // https://android-developers.googleblog.com/2016/12/introducing-the-exifinterface-support-library.html
-//        ExifInterface ei = new ExifInterface(inputStream);
-//        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-//                ExifInterface.ORIENTATION_UNDEFINED);
 
-        Bitmap rotatedBitmap = null;
         int rotateAngle = 0;
-//        switch(orientation) {
-//            case ExifInterface.ORIENTATION_ROTATE_180:
-//                rotateAngle = 180;
-//                break;
-//
-//            case ExifInterface.ORIENTATION_ROTATE_270:
-//                rotateAngle = 270;
-//                break;
-//            case ExifInterface.ORIENTATION_ROTATE_90:
-//            case ExifInterface.ORIENTATION_NORMAL:
-//            default:
-//                rotateAngle = 90;
-//        }
         int width = original.getWidth();
         int height = original.getHeight();
         if(width > height) {
             rotateAngle = 90;
         }
-        original = rotateImage(rotateAngle);
+        original = rotateImage(original, rotateAngle);
         return original;
     }
 
     public static Bitmap resizeImage(int newHeight) {
+        originalResizeRatio = 1.0;
         if(original.getHeight() > newHeight) {
-            original = resizeImage(original, newHeight);
+            resizedImage = resizeImage(original, newHeight);
+            originalResizeRatio = original.getHeight() * 1.0 / newHeight;
+        } else {
+            resizedImage = Bitmap.createBitmap(original);
         }
-        return original;
+        return resizedImage;
     }
 
     public static Bitmap resizeImage(Bitmap bitmap, int newHeight) {
-        double ratio = original.getWidth() * 1.0 / original.getHeight();
+        double ratio = bitmap.getWidth() * 1.0 / bitmap.getHeight();
         int newWidth = (int) (ratio * newHeight);
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
     }
 
-    public static Bitmap rotateImage(float angle) {
+    public static Bitmap rotateImage(Bitmap bitmap, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
-        return Bitmap.createBitmap(original, 0, 0, original.getWidth(), original.getHeight(),
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(),
                 matrix, true);
     }
 
     public static List<org.opencv.core.Point> getContourPoints() {
-        return getContourPoints(original);
+        return getContourPoints(resizedImage);
     }
 
     public static List<org.opencv.core.Point> getContourPoints(Bitmap bitmap) {
