@@ -31,19 +31,32 @@
                 android:orientation="horizontal" >
 
                 <Button
-                    android:id="@+id/Original"
+                    android:id="@+id/original"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/original"
                     android:singleLine="true"/>
 
                 <Button
-                    android:id="@+id/b_w"
+                    android:id="@+id/sharpen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sharpen"
+                    android:singleLine="true"/>
+
+                <Button
+                    android:id="@+id/b_w_adaptive"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/b_amp_w"
                     android:singleLine="true"/>
 
+                <Button
+                    android:id="@+id/b_w_hard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/b_amp_w2"
+                    android:singleLine="true"/>
 
             </LinearLayout>
         </HorizontalScrollView>

@@ -42,7 +42,14 @@ public class MainActivity extends AppCompatActivity {
     void initElements() {
         importImage = findViewById(R.id.import_image);
         imagesPreview = findViewById(R.id.images_preview);
+
         File directory = new File(getExternalFilesDir(null), MyConstants.FOLDER_NAME);
+        if(!directory.exists()) {
+            if(!directory.mkdirs()) {
+                Log.d("App", "failed to create directory");
+            }
+        }
+
         List<File> files = new ArrayList<>(Arrays.asList(directory.listFiles())); // pass this to adapter
 
         ImagesPreviewAdapter imagesPreviewAdapter = new ImagesPreviewAdapter(this, files);

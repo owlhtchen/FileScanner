@@ -56,7 +56,8 @@ public class ImagesPreviewAdapter extends RecyclerView.Adapter<ImagesPreviewAdap
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(mContext.getApplicationContext(), file.getName() + " is clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext.getApplicationContext(),
+                    "Image is saved at " + file.getPath(), Toast.LENGTH_LONG).show();
         }
     }
 

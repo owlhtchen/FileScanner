@@ -4,4 +4,6 @@
     <string name="original">Original</string>
     <string name="save">Save</string>
     <string name="import_image">Import Image</string>
+    <string name="sharpen">Sharpen</string>
+    <string name="b_amp_w2"><![CDATA[B&W2]]></string>
 </resources>
