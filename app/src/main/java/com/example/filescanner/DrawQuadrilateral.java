@@ -85,8 +85,11 @@ public class DrawQuadrilateral extends View {
 
         for(int i = 0; i < 4; i++) {
             points[i] = new Point();
-            points[i].x = (int) (contourPoints.get(i).x * displayMatScale + xOffset);
-            points[i].y = (int) (contourPoints.get(i).y * displayMatScale + yOffset);
+            points[i].x = (int) Math.min(
+                    (contourPoints.get(i).x * displayMatScale + xOffset),
+                    displayWidth - 1.0);
+            points[i].y = (int) Math.min((contourPoints.get(i).y * displayMatScale + yOffset),
+                    displayHeight - 1.0);
 //            Log.v("width", contourPoints.get(i).x  + "");
 //            Log.v("height", contourPoints.get(i).y  + "");
         }
