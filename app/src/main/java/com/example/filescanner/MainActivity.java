@@ -1,11 +1,14 @@
 package com.example.filescanner;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,11 +17,17 @@ import com.example.filescanner.constants.MyConstants;
 
 import org.opencv.android.OpenCVLoader;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static com.example.filescanner.constants.MyConstants.IMPORT_IMAGE_CHOSEN;
 
 public class MainActivity extends AppCompatActivity {
 
     Button importImage;
+    RecyclerView imagesPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +36,19 @@ public class MainActivity extends AppCompatActivity {
         initElements();
         initListeners();
         testImportOpenCV();
+
     }
 
     void initElements() {
         importImage = findViewById(R.id.import_image);
+        imagesPreview = findViewById(R.id.images_preview);
+        File directory = new File(getExternalFilesDir(null), MyConstants.FOLDER_NAME);
+        List<File> files = new ArrayList<>(Arrays.asList(directory.listFiles())); // pass this to adapter
+
+        ImagesPreviewAdapter imagesPreviewAdapter = new ImagesPreviewAdapter(this, files);
+        imagesPreview.setAdapter(imagesPreviewAdapter);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        imagesPreview.setLayoutManager(gridLayoutManager);
     }
 
     void initListeners() {

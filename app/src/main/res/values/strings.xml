@@ -3,4 +3,5 @@
     <string name="b_amp_w"><![CDATA[B&W]]></string>
     <string name="original">Original</string>
     <string name="save">Save</string>
+    <string name="import_image">Import Image</string>
 </resources>
