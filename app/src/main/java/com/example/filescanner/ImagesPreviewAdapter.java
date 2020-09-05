@@ -1,9 +1,12 @@
 package com.example.filescanner;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,15 +52,29 @@ public class ImagesPreviewAdapter extends RecyclerView.Adapter<ImagesPreviewAdap
 
             Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
             imageView.setImageBitmap(bitmap);
-//            imageView.setImageResource(R.drawable.gray_circle);
             textView.setText(file.getName());
         }
 
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(mContext.getApplicationContext(),
-                    "Image is saved at " + file.getPath(), Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(mContext.getApplicationContext(),
+                    "Image is saved at " + file.getPath(), Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.TOP, 10, 10);
+            toast.show();
+            try {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                Uri uri = Uri.parse(file.getPath());
+
+                intent.setDataAndType(uri, "image/*");
+
+                mContext.startActivity(intent);
+            } catch (Exception e) {
+                Toast.makeText(mContext.getApplicationContext(),
+                        "Not apps for opening .jpeg images found", Toast.LENGTH_LONG).show();
+            }
+
         }
     }
 

@@ -26,7 +26,7 @@ import static com.example.filescanner.constants.MyConstants.IMPORT_IMAGE_CHOSEN;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button importImage;
+    Button importImageBtn;
     RecyclerView imagesPreview;
 
     @Override
@@ -36,11 +36,10 @@ public class MainActivity extends AppCompatActivity {
         initElements();
         initListeners();
         testImportOpenCV();
-
     }
 
     void initElements() {
-        importImage = findViewById(R.id.import_image);
+        importImageBtn = findViewById(R.id.import_image);
         imagesPreview = findViewById(R.id.images_preview);
 
         File directory = new File(getExternalFilesDir(null), MyConstants.FOLDER_NAME);
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void initListeners() {
-        importImage.setOnClickListener(new View.OnClickListener() {
+        importImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_PICK);
