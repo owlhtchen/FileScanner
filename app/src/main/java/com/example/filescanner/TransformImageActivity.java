@@ -46,6 +46,7 @@ public class TransformImageActivity extends AppCompatActivity {
     Button sharpenBtn;
     Button blackWhiteAdaptiveBtn;
     Button blackWhiteHardBtn;
+    Button lightenBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class TransformImageActivity extends AppCompatActivity {
         sharpenBtn = findViewById(R.id.sharpen);
         blackWhiteAdaptiveBtn = findViewById(R.id.b_w_adaptive);
         blackWhiteHardBtn = findViewById(R.id.b_w_hard);
+        lightenBtn = findViewById(R.id.lighten);
     }
 
     void initListeners() {
@@ -108,6 +110,13 @@ public class TransformImageActivity extends AppCompatActivity {
                 transformedImage.setImageBitmap(displayImage);
             }
         });
+        lightenBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayImage = getLightenedBitmap(rectImage);
+                transformedImage.setImageBitmap(displayImage);
+            }
+        });
     }
 
     Bitmap getSharpenedBitmap(Bitmap srcBitmap) {
@@ -143,6 +152,13 @@ public class TransformImageActivity extends AppCompatActivity {
         return ImageBitmap.matToBitmap(dest);
     }
 
+    Bitmap getLightenedBitmap(Bitmap srcBitmap) {
+        Mat src = ImageBitmap.bitmapToMat(srcBitmap);
+        Mat dest = new Mat();
+        src.convertTo(dest, -1, 1.0, 50.0);
+        return ImageBitmap.matToBitmap(dest);
+    }
+
     void saveImage() {
         // save file in .../ImageDir/filename.jpeg
         File imageStorageDir = new File(getExternalFilesDir(null), MyConstants.FOLDER_NAME);
@@ -151,7 +167,8 @@ public class TransformImageActivity extends AppCompatActivity {
                 Log.d("App", "failed to create directory");
             }
         }
-        String fileName = getCurrentTimeString() + ".jpeg";
+//        String fileName = getCurrentTimeString() + ".jpeg";
+        String fileName = getCurrentTimeString() + ".jpg";
         File file = new File(imageStorageDir.getPath(), fileName);
         if (file.exists()) {
             file.delete();

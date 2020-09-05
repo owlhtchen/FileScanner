@@ -69,7 +69,7 @@ public class ImagesPreviewAdapter extends RecyclerView.Adapter<ImagesPreviewAdap
 
                 intent.setDataAndType(uri, "image/*");
 
-                mContext.startActivity(intent);
+                mContext.startActivity(Intent.createChooser(intent, "view picture using"));
             } catch (Exception e) {
                 Toast.makeText(mContext.getApplicationContext(),
                         "Not apps for opening .jpeg images found", Toast.LENGTH_LONG).show();

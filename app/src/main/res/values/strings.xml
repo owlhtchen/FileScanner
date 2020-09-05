@@ -7,4 +7,5 @@
     <string name="sharpen">Sharpen</string>
     <string name="b_amp_w2"><![CDATA[B&W2]]></string>
     <string name="open_in_file_explorer">Open in file explorer</string>
+    <string name="lighten">Lighten</string>
 </resources>

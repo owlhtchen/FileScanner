@@ -58,6 +58,13 @@
                     android:text="@string/b_amp_w2"
                     android:singleLine="true"/>
 
+                <Button
+                    android:id="@+id/lighten"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lighten"
+                    android:singleLine="true"/>
+
             </LinearLayout>
         </HorizontalScrollView>
 
